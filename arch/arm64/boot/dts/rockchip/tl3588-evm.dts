@@ -865,8 +865,7 @@
 		gpio-controller;
 		interrupt-parent = <&gpio0>;
 		interrupts = <7 IRQ_TYPE_LEVEL_LOW>;
-		pinctrl-0 = <&pmic_pins>, <&rk806_dvs1_null>,
-			    <&rk806_dvs2_null>, <&rk806_dvs3_null>;
+		pinctrl-0 = <&pmic_pins>;
 		pinctrl-names = "default";
 		spi-max-frequency = <1000000>;
 		system-power-controller;
@@ -912,9 +911,7 @@
 				regulator-ramp-delay = <12500>;
 				regulator-name = "vdd_gpu_s0";
 				regulator-enable-ramp-delay = <400>;
-				regulator-coupled-with = <&vdd_gpu_mem_s0>;
-				regulator-coupled-max-spread = <10000>;
-				regulator-state-mem {
+						regulator-state-mem {
 					regulator-off-in-suspend;
 				};
 			};
@@ -966,9 +963,7 @@
 				regulator-ramp-delay = <12500>;
 				regulator-enable-ramp-delay = <400>;
 				regulator-name = "vdd_gpu_mem_s0";
-				regulator-coupled-with = <&vdd_gpu_s0>;
-				regulator-coupled-max-spread = <10000>;
-				regulator-state-mem {
+						regulator-state-mem {
 					regulator-off-in-suspend;
 				};
 
@@ -1216,9 +1211,7 @@
 			vdd_cpu_big1_s0: dcdc-reg1 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-coupled-with = <&vdd_cpu_big1_mem_s0>;
-				regulator-coupled-max-spread = <10000>;
-				regulator-min-microvolt = <550000>;
+						regulator-min-microvolt = <550000>;
 				regulator-max-microvolt = <1050000>;
 				regulator-ramp-delay = <12500>;
 				regulator-name = "vdd_cpu_big1_s0";
@@ -1230,9 +1223,7 @@
 			vdd_cpu_big0_s0: dcdc-reg2 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-coupled-with = <&vdd_cpu_big0_mem_s0>;
-				regulator-coupled-max-spread = <10000>;
-				regulator-min-microvolt = <550000>;
+						regulator-min-microvolt = <550000>;
 				regulator-max-microvolt = <1050000>;
 				regulator-ramp-delay = <12500>;
 				regulator-name = "vdd_cpu_big0_s0";
@@ -1244,9 +1235,7 @@
 			vdd_cpu_lit_s0: dcdc-reg3 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-coupled-with = <&vdd_cpu_lit_mem_s0>;
-				regulator-coupled-max-spread = <10000>;
-				regulator-min-microvolt = <550000>;
+						regulator-min-microvolt = <550000>;
 				regulator-max-microvolt = <950000>;
 				regulator-ramp-delay = <12500>;
 				regulator-name = "vdd_cpu_lit_s0";
@@ -1270,9 +1259,7 @@
 			vdd_cpu_big1_mem_s0: dcdc-reg5 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-coupled-with = <&vdd_cpu_big1_s0>;
-				regulator-coupled-max-spread = <10000>;
-				regulator-min-microvolt = <675000>;
+						regulator-min-microvolt = <675000>;
 				regulator-max-microvolt = <1050000>;
 				regulator-ramp-delay = <12500>;
 				regulator-name = "vdd_cpu_big1_mem_s0";
@@ -1284,9 +1271,7 @@
 			vdd_cpu_big0_mem_s0: dcdc-reg6 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-coupled-with = <&vdd_cpu_big0_s0>;
-				regulator-coupled-max-spread = <10000>;
-				regulator-min-microvolt = <675000>;
+						regulator-min-microvolt = <675000>;
 				regulator-max-microvolt = <1050000>;
 				regulator-ramp-delay = <12500>;
 				regulator-name = "vdd_cpu_big0_mem_s0";
@@ -1310,9 +1295,7 @@
 			vdd_cpu_lit_mem_s0: dcdc-reg8 {
 				regulator-always-on;
 				regulator-boot-on;
-				regulator-coupled-with = <&vdd_cpu_lit_s0>;
-				regulator-coupled-max-spread = <10000>;
-				regulator-min-microvolt = <675000>;
+						regulator-min-microvolt = <675000>;
 				regulator-max-microvolt = <950000>;
 				regulator-ramp-delay = <12500>;
 				regulator-name = "vdd_cpu_lit_mem_s0";
