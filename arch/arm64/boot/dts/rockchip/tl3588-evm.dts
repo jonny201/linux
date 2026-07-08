@@ -258,6 +258,71 @@
 		vin-supply = <&vcc5v0_usb>;
 	};
 
+	clk16m: clk16m {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <16000000>;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&user_key_pin>;
+
+		user-key1 {
+			label = "user-key1";
+			linux,code = <KEY_PROG2>;
+			gpios = <&gpio0 RK_PC4 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		user-led0 {
+			function = LED_FUNCTION_INDICATOR;
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio0 RK_PC5 GPIO_ACTIVE_HIGH>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&user_led0_pin>;
+			default-state = "off";
+		};
+
+		user-led1 {
+			function = LED_FUNCTION_INDICATOR;
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio0 RK_PD3 GPIO_ACTIVE_HIGH>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&user_led1_pin>;
+			default-state = "off";
+		};
+
+		led-heartbeat {
+			function = LED_FUNCTION_HEARTBEAT;
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio2 RK_PC5 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "heartbeat";
+		};
+
+		led-disk {
+			function = LED_FUNCTION_DISK;
+			gpios = <&gpio0 RK_PC2 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "mmc0";
+		};
+	};
+
+	vcc5v0_typec: regulator-vcc5v0-typec {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc5v0_typec";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		enable-active-high;
+		gpio = <&gpio1 RK_PB0 GPIO_ACTIVE_HIGH>;
+		vin-supply = <&vcc5v0_usb>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&vcc5v0_typec_enable>;
+	};
+
 	vcc5v0_sys: regulator-vcc5v0-sys {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0_sys";
@@ -1382,7 +1447,46 @@
 };
 
 &u2phy3 {
-	status = "okay";
+	status = "okay";	gpio-leds {
+		user_led0_pin: user-led0-pin {
+			rockchip,pins = <0 RK_PC5 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+
+		user_led1_pin: user-led1-pin {
+			rockchip,pins = <0 RK_PD3 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	gpio-keys {
+		user_key_pin: user-key-pin {
+			rockchip,pins = <0 RK_PC4 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	gmac0-phy-reset {
+		gmac0_phy_reset: gmac0-phy-reset {
+			rockchip,pins = <3 RK_PB2 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	gmac1-phy-reset {
+		gmac1_phy_reset: gmac1-phy-reset {
+			rockchip,pins = <3 RK_PB6 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	typec-dp {
+		vcc5v0_typec_enable: vcc5v0-typec-enable {
+			rockchip,pins = <1 RK_PB0 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	typec-int {
+		typec_int: typec-int {
+			rockchip,pins = <4 RK_PB6 RK_FUNC_GPIO &pcfg_pull_up>;
+		};
+	};
+
 };
 
 &u2phy3_host {
