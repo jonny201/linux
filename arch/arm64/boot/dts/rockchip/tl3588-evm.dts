@@ -222,28 +222,6 @@
 		pinctrl-0 = <&vcc3v3_pcie30_en>;
 	};
 
-	vcc3v3_pciewl_vbat: regulator-vcc3v3-pciewl-vbat {
-		compatible = "regulator-fixed";
-		regulator-always-on;
-		regulator-boot-on;
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		regulator-name = "wlan-vbat";
-		vin-supply = <&vcc_3v3_s0>;
-	};
-
-	vcc3v3_wlan: regulator-vcc3v3-wlan {
-		compatible = "regulator-fixed";
-		enable-active-high;
-		gpios = <&gpio3 RK_PB1 GPIO_ACTIVE_HIGH>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&wifi_pwren>;
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		regulator-name = "wlan-en";
-		vin-supply = <&vcc3v3_pciewl_vbat>;
-	};
-
 	vcc5v0_host: regulator-vcc5v0-host {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0_host";
@@ -353,15 +331,6 @@
 		vin-supply = <&vcc5v0_usbdcin>;
 	};
 
-	vccio_wl: regulator-vccio-wl {
-		compatible = "regulator-fixed";
-		regulator-always-on;
-		regulator-boot-on;
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
-		regulator-name = "wlan-vddio";
-		vin-supply = <&vcc_1v8_s0>;
-	};
 };
 
 &combphy0_ps {
@@ -410,16 +379,39 @@
 
 &gmac0 {
 	clock_in_out = "output";
-	phy-handle = <&rgmii_phy>;
+	phy-handle = <&rgmii_phy0>;
 	phy-mode = "rgmii-rxid";
 	pinctrl-0 = <&gmac0_miim
 		     &gmac0_tx_bus2
 		     &gmac0_rx_bus2
 		     &gmac0_rgmii_clk
-		     &gmac0_rgmii_bus>;
+		     &gmac0_rgmii_bus
+		     &gmac0_phy_reset>;
 	pinctrl-names = "default";
-	rx_delay = <0x00>;
-	tx_delay = <0x43>;
+	rx_delay = <0x12>;
+	tx_delay = <0x36>;
+	snps,reset-active-low;
+	snps,reset-delays-us = <20000 20000 100000>;
+	snps,reset-gpio = <&gpio3 RK_PB2 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
+
+&gmac1 {
+	clock_in_out = "output";
+	phy-handle = <&rgmii_phy1>;
+	phy-mode = "rgmii-rxid";
+	pinctrl-0 = <&gmac1_miim
+		     &gmac1_tx_bus2
+		     &gmac1_rx_bus2
+		     &gmac1_rgmii_clk
+		     &gmac1_rgmii_bus
+		     &gmac1_phy_reset>;
+	pinctrl-names = "default";
+	rx_delay = <0x12>;
+	tx_delay = <0x36>;
+	snps,reset-active-low;
+	snps,reset-delays-us = <20000 20000 100000>;
+	snps,reset-gpio = <&gpio3 RK_PB6 GPIO_ACTIVE_LOW>;
 	status = "okay";
 };
 
@@ -491,27 +483,52 @@
 &i2c2 {
 	status = "okay";
 
-	usbc0: usb-typec@22 {
-		compatible = "fcs,fusb302";
-		reg = <0x22>;
-		interrupt-parent = <&gpio3>;
-		interrupts = <RK_PB4 IRQ_TYPE_LEVEL_LOW>;
+	es8388: audio-codec@11 {
+		compatible = "everest,es8388", "everest,es8328";
+		reg = <0x11>;
+		#sound-dai-cells = <0>;
+		clocks = <&cru I2S0_8CH_MCLKOUT>;
+		clock-names = "mclk";
+		assigned-clocks = <&cru I2S0_8CH_MCLKOUT>;
+		assigned-clock-rates = <12288000>;
+		AVDD-supply = <&avcc_1v8_codec_s0>;
+		DVDD-supply = <&avcc_1v8_codec_s0>;
+		HPVDD-supply = <&vcc_3v3_s0>;
+		PVDD-supply = <&vcc_3v3_s0>;
+		status = "okay";
+	};
+
+	touchscreen@5d {
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+		interrupt-parent = <&gpio1>;
+		interrupts = <RK_PA4 IRQ_TYPE_EDGE_FALLING>;
+		irq-gpios = <&gpio1 RK_PA4 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio0 RK_PB0 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+
+	usb-typec@4e {
+		compatible = "hynetek,husb311";
+		reg = <0x4e>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <RK_PB6 IRQ_TYPE_LEVEL_LOW>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&usbc0_int>;
-		vbus-supply = <&vbus5v0_typec>;
+		pinctrl-0 = <&typec_int>;
+		vbus-supply = <&vcc5v0_typec>;
 		status = "okay";
 
 		usb_con: connector {
 			compatible = "usb-c-connector";
 			label = "USB-C";
 			data-role = "dual";
-			op-sink-microwatt = <1000000>;
 			power-role = "dual";
+			try-power-role = "sink";
+			op-sink-microwatt = <1000000>;
 			sink-pdos =
 				<PDO_FIXED(5000, 1000, PDO_FIXED_USB_COMM)>;
 			source-pdos =
 				<PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)>;
-			try-power-role = "source";
 
 			ports {
 				#address-cells = <1>;
@@ -519,23 +536,20 @@
 
 				port@0 {
 					reg = <0>;
-
-					usbc0_orien_sw: endpoint {
+					typec_orien_sw: endpoint {
 						remote-endpoint = <&usbdp_phy0_orientation_switch>;
 					};
 				};
 
 				port@1 {
 					reg = <1>;
-
-					usbc0_role_sw: endpoint {
+					typec_role_sw: endpoint {
 						remote-endpoint = <&dwc3_0_role_switch>;
 					};
 				};
 
 				port@2 {
 					reg = <2>;
-
 					dp_altmode_mux: endpoint {
 						remote-endpoint = <&usbdp_phy0_dp_altmode_mux>;
 					};
@@ -543,35 +557,10 @@
 			};
 		};
 	};
-
-	hym8563: rtc@51 {
-		compatible = "haoyu,hym8563";
-		reg = <0x51>;
-		#clock-cells = <0>;
-		clock-output-names = "hym8563";
-		pinctrl-names = "default";
-		pinctrl-0 = <&hym8563_int>;
-		interrupt-parent = <&gpio0>;
-		interrupts = <RK_PD4 IRQ_TYPE_LEVEL_LOW>;
-		wakeup-source;
-	};
 };
 
 &i2c7 {
-	status = "okay";
-
-	es8388: audio-codec@11 {
-		compatible = "everest,es8388", "everest,es8328";
-		reg = <0x11>;
-		clocks = <&cru I2S0_8CH_MCLKOUT>;
-		assigned-clocks = <&cru I2S0_8CH_MCLKOUT>;
-		assigned-clock-rates = <12288000>;
-		AVDD-supply = <&avcc_1v8_codec_s0>;
-		DVDD-supply = <&avcc_1v8_codec_s0>;
-		HPVDD-supply = <&vcc_3v3_s0>;
-		PVDD-supply = <&vcc_3v3_s0>;
-		#sound-dai-cells = <0>;
-	};
+	status = "disabled";
 };
 
 &i2s0_8ch {
@@ -585,21 +574,25 @@
 };
 
 &mdio0 {
-	rgmii_phy: ethernet-phy@1 {
-		/* RTL8211F */
-		compatible = "ethernet-phy-id001c.c916";
+	rgmii_phy0: ethernet-phy@0 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <0x0>;
+		/* YT8521H needs eee-broken-1000t */
+		eee-broken-1000t;
+	};
+};
+
+&mdio1 {
+	rgmii_phy1: ethernet-phy@1 {
+		compatible = "ethernet-phy-ieee802.3-c22";
 		reg = <0x1>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&rtl8211f_rst>;
-		reset-assert-us = <20000>;
-		reset-deassert-us = <100000>;
-		reset-gpios = <&gpio4 RK_PB3 GPIO_ACTIVE_LOW>;
+		eee-broken-1000t;
 	};
 };
 
 &pcie2x1l0 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pcie2_0_rst>, <&pcie2_0_wake>, <&pcie2_0_clkreq>, <&wifi_host_wake_irq>;
+	pinctrl-0 = <&pcie2_0_rst>, <&pcie2_0_wake>, <&pcie2_0_clkreq>;
 	reset-gpios = <&gpio4 RK_PA5 GPIO_ACTIVE_HIGH>;
 	supports-clkreq;
 	vpcie3v3-supply = <&vcc3v3_wlan>;
@@ -836,7 +829,6 @@
 			pins = "gpio_pwrctrl3";
 			function = "pin_fun0";
 		};
-
 
 		regulators {
 			vdd_gpu_s0: dcdc-reg1 {
@@ -1216,7 +1208,6 @@
 					regulator-off-in-suspend;
 				};
 			};
-
 
 			vdd_cpu_big0_mem_s0: dcdc-reg6 {
 				regulator-always-on;
