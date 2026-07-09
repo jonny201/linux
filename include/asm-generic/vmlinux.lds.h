@@ -624,6 +624,12 @@
 		__lock_text_start = .;					\
 		*(.spinlock.text)					\
 		__lock_text_end = .;
+#define CYCLICTEST_HOT_TEXT						\
+	ALIGN_FUNCTION();					\
+	__cyclictest_hot_text_start = .;				\
+	*(.text.cyclictest_hot)					\
+	__cyclictest_hot_text_end = .;
+
 
 #define KPROBES_TEXT							\
 		ALIGN_FUNCTION();					\

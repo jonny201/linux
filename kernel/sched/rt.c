@@ -971,7 +971,7 @@ static inline int rt_se_prio(struct sched_rt_entity *rt_se)
  * Update the current task's runtime statistics. Skip current tasks that
  * are not in our scheduling class.
  */
-static void update_curr_rt(struct rq *rq)
+static void __cyclictest_hot update_curr_rt(struct rq *rq)
 {
 	struct task_struct *donor = rq->donor;
 	s64 delta_exec;
@@ -1432,7 +1432,7 @@ static void dequeue_rt_entity(struct sched_rt_entity *rt_se, unsigned int flags)
 /*
  * Adding/removing a task to/from a priority array:
  */
-static void
+static void __cyclictest_hot
 enqueue_task_rt(struct rq *rq, struct task_struct *p, int flags)
 {
 	struct sched_rt_entity *rt_se = &p->rt;
@@ -1452,7 +1452,7 @@ enqueue_task_rt(struct rq *rq, struct task_struct *p, int flags)
 		enqueue_pushable_task(rq, p);
 }
 
-static bool dequeue_task_rt(struct rq *rq, struct task_struct *p, int flags)
+static bool __cyclictest_hot dequeue_task_rt(struct rq *rq, struct task_struct *p, int flags)
 {
 	struct sched_rt_entity *rt_se = &p->rt;
 
@@ -1697,7 +1697,7 @@ static struct sched_rt_entity *pick_next_rt_entity(struct rt_rq *rt_rq)
 	return next;
 }
 
-static struct task_struct *_pick_next_task_rt(struct rq *rq)
+static struct task_struct *__cyclictest_hot _pick_next_task_rt(struct rq *rq)
 {
 	struct sched_rt_entity *rt_se;
 	struct rt_rq *rt_rq  = &rq->rt;
@@ -1712,7 +1712,7 @@ static struct task_struct *_pick_next_task_rt(struct rq *rq)
 	return rt_task_of(rt_se);
 }
 
-static struct task_struct *pick_task_rt(struct rq *rq, struct rq_flags *rf)
+static struct task_struct *__cyclictest_hot pick_task_rt(struct rq *rq, struct rq_flags *rf)
 {
 	struct task_struct *p;
 
@@ -1724,7 +1724,7 @@ static struct task_struct *pick_task_rt(struct rq *rq, struct rq_flags *rf)
 	return p;
 }
 
-static void put_prev_task_rt(struct rq *rq, struct task_struct *p, struct task_struct *next)
+static void __cyclictest_hot put_prev_task_rt(struct rq *rq, struct task_struct *p, struct task_struct *next)
 {
 	struct sched_rt_entity *rt_se = &p->rt;
 	struct rt_rq *rt_rq = &rq->rt;

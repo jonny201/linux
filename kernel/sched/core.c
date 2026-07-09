@@ -56,6 +56,7 @@
 #include <linux/mutex_api.h>
 #include <linux/nmi.h>
 #include <linux/nospec.h>
+#include <linux/prefetch.h>
 #include <linux/perf_event_api.h>
 #include <linux/profile.h>
 #include <linux/psi.h>
@@ -3802,7 +3803,7 @@ static inline bool proxy_needs_return(struct rq *rq, struct task_struct *p)
 #endif /* CONFIG_SCHED_PROXY_EXEC */
 
 static void
-ttwu_do_activate(struct rq *rq, struct task_struct *p, int wake_flags,
+__cyclictest_hot ttwu_do_activate(struct rq *rq, struct task_struct *p, int wake_flags,
 		 struct rq_flags *rf)
 {
 	int en_flags = ENQUEUE_WAKEUP | ENQUEUE_NOCLOCK;
@@ -4064,7 +4065,7 @@ static bool ttwu_queue_wakelist(struct task_struct *p, int cpu, int wake_flags)
 	return false;
 }
 
-static void ttwu_queue(struct task_struct *p, int cpu, int wake_flags)
+static void __cyclictest_hot ttwu_queue(struct task_struct *p, int cpu, int wake_flags)
 {
 	struct rq *rq = cpu_rq(cpu);
 	struct rq_flags rf;
@@ -4248,7 +4249,7 @@ bool ttwu_state_match(struct task_struct *p, unsigned int state, int *success)
  * Return: %true if @p->state changes (an actual wakeup was done),
  *	   %false otherwise.
  */
-int try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
+int __cyclictest_hot try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
 {
 	guard(preempt)();
 	int cpu, success = 0;

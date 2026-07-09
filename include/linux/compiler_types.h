@@ -137,6 +137,8 @@ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
  * clang: https://clang.llvm.org/docs/AttributeReference.html#preserve-most
  */
 #if __has_attribute(__preserve_most__) && (defined(CONFIG_X86_64) || defined(CONFIG_ARM64))
+#define __cyclictest_hot	__attribute__((__section__(".text.cyclictest_hot")))
+
 # define __preserve_most notrace __attribute__((__preserve_most__))
 #else
 # define __preserve_most
@@ -214,6 +216,8 @@ struct ftrace_likely_data {
 #elif defined(CC_USING_PATCHABLE_FUNCTION_ENTRY)
 #define notrace			__attribute__((patchable_function_entry(0, 0)))
 #else
+#define __cyclictest_hot	__attribute__((__section__(".text.cyclictest_hot")))
+
 #define notrace			__attribute__((__no_instrument_function__))
 #endif
 

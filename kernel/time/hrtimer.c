@@ -1101,7 +1101,7 @@ EXPORT_SYMBOL_GPL(hrtimer_forward);
  *
  * Returns true when the new timer is the leftmost timer in the tree.
  */
-static bool enqueue_hrtimer(struct hrtimer *timer, struct hrtimer_clock_base *base,
+static bool __cyclictest_hot enqueue_hrtimer(struct hrtimer *timer, struct hrtimer_clock_base *base,
 			    enum hrtimer_mode mode, bool was_armed)
 {
 	lockdep_assert_held(&base->cpu_base->lock);
@@ -1136,7 +1136,7 @@ static inline void base_update_next_timer(struct hrtimer_clock_base *base)
  * reprogram to zero. This is useful, when the context does a reprogramming
  * anyway (e.g. timer interrupt)
  */
-static void __remove_hrtimer(struct hrtimer *timer, struct hrtimer_clock_base *base,
+static void __cyclictest_hot __remove_hrtimer(struct hrtimer *timer, struct hrtimer_clock_base *base,
 			     bool newstate, bool reprogram)
 {
 	struct hrtimer_cpu_base *cpu_base = base->cpu_base;
@@ -1358,7 +1358,7 @@ enum {
 	HRTIMER_REPROGRAM_FORCE,
 };
 
-static int __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim, u64 delta_ns,
+static int __cyclictest_hot __hrtimer_start_range_ns(struct hrtimer *timer, ktime_t tim, u64 delta_ns,
 				    const enum hrtimer_mode mode, struct hrtimer_clock_base *base)
 {
 	struct hrtimer_cpu_base *this_cpu_base = this_cpu_ptr(&hrtimer_bases);
@@ -1987,7 +1987,7 @@ EXPORT_SYMBOL_GPL(hrtimer_active);
  * a false negative if the read side got smeared over multiple consecutive
  * __run_hrtimer() invocations.
  */
-static void __run_hrtimer(struct hrtimer_cpu_base *cpu_base, struct hrtimer_clock_base *base,
+static void __cyclictest_hot __run_hrtimer(struct hrtimer_cpu_base *cpu_base, struct hrtimer_clock_base *base,
 			  struct hrtimer *timer, ktime_t now, unsigned long flags)
 	__must_hold(&cpu_base->lock)
 {
@@ -2182,7 +2182,7 @@ hrtimer_interrupt_rearm(struct hrtimer_cpu_base *cpu_base, ktime_t expires_next)
  * High resolution timer interrupt
  * Called with interrupts disabled
  */
-void hrtimer_interrupt(struct clock_event_device *dev)
+void __cyclictest_hot hrtimer_interrupt(struct clock_event_device *dev)
 {
 	struct hrtimer_cpu_base *cpu_base = this_cpu_ptr(&hrtimer_bases);
 	ktime_t expires_next, now, entry_time, delta;
