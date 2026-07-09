@@ -420,6 +420,9 @@
 	pinctrl-names = "default";
 	rx_delay = <0x00>;
 	tx_delay = <0x43>;
+	snps,reset-gpio = <&gpio3 RK_PB2 GPIO_ACTIVE_LOW>;
+	snps,reset-delays-us = <20000 20000 100000>;
+	snps,reset-active-low;
 	status = "okay";
 };
 
@@ -586,10 +589,10 @@
 		compatible = "ethernet-phy-id001c.c916";
 		reg = <0x1>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&rtl8211f_rst>;
+		pinctrl-0 = <&gmac0_phy_reset>;
 		reset-assert-us = <20000>;
 		reset-deassert-us = <100000>;
-		reset-gpios = <&gpio4 RK_PB3 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&gpio3 RK_PB2 GPIO_ACTIVE_LOW>;
 	};
 };
 
