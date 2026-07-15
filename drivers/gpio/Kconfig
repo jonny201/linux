@@ -2029,6 +2029,17 @@ config GPIO_USBIO
 	  This driver can also be built as a module. If so, the module
 	  will be called gpio_usbio.
 
+config GPIO_FIREFLY
+	tristate "Firefly GPIO Demo support"
+	depends on OF
+	help
+	  Say yes here to enable the Firefly GPIO driver, a simple
+	  GPIO output and interrupt demonstration driver for Firefly
+	  and compatible boards (e.g. Forlinx OK3568-C).
+
+	  This driver can also be built as a module. If so, the module
+	  will be called gpio-firefly.
+
 endmenu
 
 menu "Virtual GPIO drivers"
